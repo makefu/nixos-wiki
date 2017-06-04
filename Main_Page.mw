@@ -7,11 +7,10 @@ Expect breaking changes until this message is removed.
 
 
 
-Consult the [https://meta.wikimedia.org/wiki/Help:Contents User's Guide] for information on using the wiki software.
+
 
 == Getting started ==
-* [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Configuration_settings Configuration settings list]
-* [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:FAQ MediaWiki FAQ]
-* [https://lists.wikimedia.org/mailman/listinfo/mediawiki-announce MediaWiki release mailing list]
-* [https://www.mediawiki.org/wiki/Special:MyLanguage/Localisation#Translation_resources Localise MediaWiki for your language]
-* [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Combating_spam Learn how to combat spam on your wiki]
+* Nix [http://nixos.org/nix/manual/ manual]
+* NixOS [http://nixos.org/nixos/manual/ manual]
+* Nixpkgs [http://nixos.org/nixpkgs/manual/ manual]
+* NixOps [http://hydra.nixos.org/job/nixops/master/tarball/latest/download-by-type/doc/manual manual]
