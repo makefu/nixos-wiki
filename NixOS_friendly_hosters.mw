@@ -4,5 +4,5 @@
 
 == Support NixOS via custom ISO ==
 * [https://www.vultr.com/ Vultr] - nixos.wiki is running on a NixOS VPS at Vultr
-* [https://www.netcup.de/ Netcup]
+* [https://www.netcup.de/ Netcup] - NixOS ISO can be uploaded via FTP to be available in the server control panel. (in the SCP, navigate to: 'Media' -> 'Images')
 * [https://www.hetzner.de/ Hetzner] - NixOS ISO can be provided by the support. Just request them to make the ISO available via the support formular (provide a download link to the ISO)
