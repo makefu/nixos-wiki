@@ -32,7 +32,7 @@ To activate the configuration and load the ZFS kernel module, run:
   modprobe zfs
 </pre>
 
-(Note that manually loading the ZFS kernel module is only necessary in the install environment).
+(Note that manually loading the ZFS kernel module is only necessary in the install environment).<ref>Todo: Verify if this is still the case with NixOS >= 17.03 <ref>
 
 All ZFS functionality should now be available.
 
