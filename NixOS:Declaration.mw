@@ -1,6 +1,6 @@
 NixOS module has declarations to provide an interface for other modules.  Option declarations are used to make NixOS aware of configuration possibilities or to hide the complexity of configuration.  Option declarations are used to provide an interface over the inherent complexity of configuring the system.
 
-See also [http://nixos.org/nixos/manual/#idm140067877106960 the manual].
+See also [https://nixos.org/nixos/manual/index.html#sec-option-declarations the manual].
 
 = Option attributes =
 
