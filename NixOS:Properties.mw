@@ -1,0 +1,12 @@
+Properties are used to scope option definitions with control flow statements which do not break ([[NixOS:config_argument#Conditional_Statements|example]]) the highly recursive process of merging modules.  All properties are defined in [https://github.com/NixOS/nixpkgs/blob/master/lib/modules.nix <code>lib/modules.nix</code>].
+
+* <code>mkNotdef</code>: Invalidate a definition.  Any attribute which has this value is considered as not defined in the current module.
+* <code>mkIf condition definitions</code>: Create a conditional statements around multiple definitions.  The definitions are considered only if the condition is verified.
+* <code>mkThenElse { thenPart = definitions; elsePart = definitions; }</code>: Create two different evaluations based on the result of all previous <code>mkIf</code> conditions.
+* <code>mkAlways</code>: Ignore all previous <code>mkIf</code> conditions.
+* <code>mkOverrideTemplate priority template definitions</code>: Set a priority level to all definitions which are enumerated inside the template.  Only definitions with the lower priority level are kept.  The default priority level is 100.  An empty template is considered as all definitions.
+* <code>mkOverride priority template definitions</code>: Currently the same as <code>mkOverrideTemplate</code>.
+* <code>mkDefaultValue definitions</code>: A shortcut notation to define default values (priority level of 1000) inside the configuration.  This is extremely useful to avoid references to properties inside the user configuration while overriding the default value of the option.  Any option define without this property will take precedence over it.
+* <code>mkOrder rank definitions</code>: Add a rank value to definitions.  This is useful for options where some dependences between definitions exist.  A lower rank will add the definitions among the first definitions.  The default rank is 100.
+* <code>mkHeader definitions</code>: A shortcut notation to define a rank of 10 with <code>mkOrder</code>.
+* <code>mkFooter definitions</code>: A shortcut notation to define a rank of 1000 with <code>mkOrder</code>.
