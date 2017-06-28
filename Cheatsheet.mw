@@ -76,28 +76,87 @@ Or with collections, add the package to your ~/.nixpkgs/config.nix and run
 <pre>nix-env -i all</pre>
 |
 |-
-|
-|
-|
-|
-|
-|-
-|
-|
-|
+|Uninstall a package
+|<pre>sudo apt-get remove emacs</pre>
+|remove from /etc/nixos/configuration.nix
+<pre>sudo nixos-rebuild switch</pre>
 |
 |
 |-
-|
-|
-|
+|Uninstall a package removing its configuration
+|<pre>apt-get purge emacs</pre>
+|All configuration is in configuration.nix
 |
 |
 |-
+|Update the list of packages
+|<pre>sudo apt-get update</pre>
+|<pre>sudo nix-channel --update</pre>
+|<pre>nix-channel --update</pre>
+|
+|-
+|Upgrade packages
+|<pre>sudo apt-get upgrade</pre>
+|<pre>sudo nixos-rebuild switch</pre>
+|<pre>nix-env -u</pre>
+|
+|-
+|Check for broken dependencies
+|<pre>sudo apt-get check</pre>
+|<pre>nix-store --verify --check-contents</pre>
+|unneeded!
+|
+|-
+|List package dependencies
+|<pre>apt-cache depends emacs</pre>
+|<pre>nix-store --query --requisites $(readlink -f /run/current-system)
+nix-store -q --tree /nix/var/nix/profiles/system</pre>
+|<pre>nix-store --query --references\
+  $(nix-instantiate '<nixpkgs>' -A emacs)</pre>
+For installed packages:
+<pre>nix-store --query --references $(which emacs)</pre>
+|
+|-
+|List which packages depend on this one (reverse dependencies)
+|<pre>apt-cache rdepends emacs</pre>
+|
+|For installed packages (only print reverse dependencies *which are already installed*):
+<pre>nix-store --query --referrers $(which emacs)</pre>
+|
+|-
+|Verify all installed packages
+|<pre>debsums</pre>
+|<pre>sudo nix-store --verify --check-contents</pre>
+|<pre>nix-store --verify --check-contents</pre>
+|
+|-
+|Fix packages with failed checksums
+|Reinstall broken packages
+|<pre>sudo nix-store --verify --check-contents --repair</pre>
+|<pre>nix-store --verify --check-contents --repair</pre>
+|
+|-
+|Select major version and stable/unstable
+|Change sources.list and apt-get dist-upgrade. A an extremely infrequent and destructive operation. The nix variants are safe and easy to use.
+|<pre>nix-channel --add\
+   https://nixos.org/channels/nixpkgs-unstable <name></pre>
+Add the unstable channel. At that address you will find names for other versions and variants. Name can be any string.
+<pre>nix-channel --remove <name></pre>
+To eliminate a channel.
+<pre>nix-channel --list</pre>
+To show all installed channel.
+|When run by a user channels work locally, when run by root they're used as the system-wide channels.
+|
+|-
+|Private package repository
+|PPA
+|Define your package tree as in the general column, and include it in configuration.nix, then list your packages in systemPackages to make them available system wide
+|See [https://sandervanderburg.blogspot.de/2014/07/managing-private-nix-packages-outside.html]
+|
+|-
+|Install a particular version of a package
 |
 |
 |
 |
-|
-
 |}
