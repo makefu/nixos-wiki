@@ -159,4 +159,53 @@ To show all installed channel.
 |
 |
 |
+|-
+| colspan="5" style="text-align:center"| Package configuration
+|-
+|Configure a package
+|<pre>sudo dpkg-reconfigure <package></pre>
+|edit /etc/nixos/configuration.nix
+|edit ~/.nixpkgs/config.nix TODO More details about how to edit
+|
+|-
+|List package options
+|
+|
+|
+|
+|-
+|Global package configuration
+|Modify configuration file in /etc/
+|
+|
+|
+|-
+| colspan="5" style="text-align:center"| Package configuration
+|-
+|Find packages
+|<pre>apt-cache search emacs</pre>
+|<pre>nix-env -qaP '.*emacs.*'</pre>
+|<pre>nix-env -qaP '.*emacs.*'</pre>
+|
+|-
+|Show package description
+|<pre>apt-cache show emacs</pre>
+|<pre>nix-env -qa --description '.*emacs.*'</pre>
+|<pre>nix-env -qa --description '.*emacs.*'</pre>
+|
+|-
+|Show files installed by package
+|<pre>dpkg -L emacs</pre>
+|<pre>readlink -f $(which emacs)
+ /nix/store/ji06y4haijly0i0knmr986l2dajffv1p-emacs-24.4/bin/emacs-24.4</pre>
+then
+<pre>du -a /nix/store/ji06y4haijly0i0knmr986l2dajffv1p-emacs-24.4</pre>
+|<pre></pre>
+|
+|-
+|Show package for file
+|<pre>dpkg -S /usr/bin/emacs</pre>
+|follow the symlink
+|follow the symlink
+|
 |}
