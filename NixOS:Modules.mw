@@ -1,0 +1,88 @@
+NixOS has modules to have non-intrusive extensions.  Modules are made to avoid manipulating the core of NixOS while allowing the user to separate their <code>configuration.nix</code> file into multiple sub-file which are specific to a device or a service configuration.  Such separation permits the creation of services which can be tested for a while before being merged in the main line of NixOS.
+
+This page describes how you can create a module.  If you want a pratical view, you should have a look into this small [[NixOS:extend_NixOS|tutorial]].
+
+== Vocabulary ==
+
+* [[NixOS:Declaration|Declaration]]: All options which are used with the <code>mkOption</code> function are declared.  Declared options should at least have a <code>description</code> attribute which contains a multiple-line text for describing the effect of the option.
+* [[NixOS:Definition|Definition]]: All options which are set to plain values are considered as definitions.  The plain value may vary depending on the expected type of the option.
+* Use: All result of options which are used to compute values of other option are option usages.
+* [[NixOS:Properties|Properties]]: These are option definition modifiers.  Properties may change the influence of an option definition in the computation of an option result.
+
+To find all files which are defining or declaring an option, you may refer to the generated [http://nixos.org/nixos/manual NixOS manual] or to the <code>man</code> page of <code>configuration.nix</code>.
+
+== Syntax ==
+
+Modules are declared with the following syntax:
+
+<pre>
+{
+  imports = [
+    # list of path to other modules.
+  ];
+
+  options = {
+    # attribute set of option declarations.
+  };
+
+  config = {
+    # attribute set of option definitions.
+  };
+}
+</pre>
+
+Another syntax exists for cases where no option declaration are necessary:
+
+<pre>
+{
+  require = [
+    # list of path to other modules.
+  ];
+
+  # attribute set of option definitions.
+}
+</pre>
+
+Both of the previous syntax can be refined with an attribute set argument added on top:
+
+<pre>
+{config, pkgs, ...}:
+
+{
+  # ...
+}
+</pre>
+
+The following arguments can be retrieved from this attribute set:
+* [[NixOS:config_argument|<code>config</code>]]: The configuration of the entire system.
+* <code>options</code>: All option declarations refined with all definition and declaration references.
+* <code>pkgs</code>: The attribute set extracted from the Nix package collection and enhanced with the <code>nixpkgs.config</code> option.
+* <code>modulesPath</code>: The location of the <code>module</code> directory of NixOS.
+
+For more information, you should refer to NixOS sources, with more insight into [https://github.com/NixOS/nixos/blob/master/lib/eval-config.nix <code>nixos/lib/eval-config.nix</code>].
+
+More computation or organisation can be necessary to enhance modules.  In which case, you can add a <code>let .. in ..</code> statement between the argument and the attribute set.
+
+<pre>
+{config, pkgs, ...}:
+
+let
+  # intermediate result.
+in
+
+{
+  # ...
+}
+</pre>
+
+== References ==
+
+* [http://nixos.org/nixos/manual/ NixOS Documentation]
+
+== Related Work ==
+
+* Debian [http://wiki.debian.org/PackageConfigUpgrade Config::Model]:
+target configuration upgrades by abstracting the option of the configuration.  Each file is a tree structure where leaves are values defined with an interpreted type.  The interpreters are defined for each meta-configuration files name *.conf.  Configuration files does not seems to interact with each other to make consistent configuration.  They provide an UI for editing their configuration file.
+
+[[Category:Configuration]]
+[[Category:NixOS]]
