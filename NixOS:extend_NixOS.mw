@@ -1,0 +1,291 @@
+This tutorial covers the major points of NixOS configuration. In this tutorial, we configure NixOS to start an IRC client every time the OS starts. This tutorial will  start by adding this functionality to the <code>configuration.nix</code> file. Then, this functionality is extracted into a separate file, which NixOS calls a "module".
+
+= Example: Add a System Service =
+
+Suppose you want to start an IRC client and connect to your favorite channel every time your NixOS starts. To do this, we will start the IRC client using a shell command. In other distributions, to perform an action on system start, you place the shell command in an init script, which is usually the <code>/etc/init.d</code> file.
+
+In NixOS, on the other hand, all system files are overwritten when the <code>configuration.nix</code> file is updated and the system is rebuilt. How does a NixOS user execute a shell command on system start? In NixOS, all dependencies are clean and organized, which means they are changed in a single place - the <code>configuration.nix</code> and the modules it loads. To change the system's behavior, then, we must add this IRC shell command to this configuration file.
+
+Lets start the IRC session using <code>irssi</code> as the IRC client. We'll run it inside a <code>screen</code> daemon, which enables the IRC session to continue even after we log out of our shell session.
+
+= Implementations =
+
+== Quick Implementation ==
+
+The simplest way to implement this is to add a simple snippet of code to the <code>/etc/nixos/configuration.nix</code> file:
+
+ {pkgs, ...}:
+ 
+ # pkgs is used to fetch screen & irssi.
+  
+ {
+   jobs.ircSession = {
+     description = "Start the irc client of username.";
+     startOn = "started network-interfaces";
+     exec = <nowiki>''/var/setuid-wrappers/sudo -u username -- ${pkgs.screen}/bin/screen -m -d -S irc ${pkgs.irssi}/bin/irssi'';</nowiki>
+   };
+ 
+   environment.systemPackages = [ pkgs.screen ];
+   security.sudo.enable = true;
+ 
+   # ... usual configuration ...
+ }
+
+What does this do? The <code>jobs.ircSession</code> bit is an option which adds a new system service. This option is defined elsewhere in the NixOS configuration files. This is one of many options; you can see a list of all NixOS configuration options in the [http://nixos.org/nixos/manual/#ch-options NixOS Manual: List of Options]. We add attributes to this option to configure our new service. As you can see, we configure it to start when the network connects, and to execute a shell command.
+
+After rebuilding the NixOS configuration with this file, our IRC session should start when our network connects. The IRC session is started as a child to the screen daemon, which is independent of any user's session and will continue running when we log out. To connect to the IRC session, we SSH into the system, reconnect to the screen session, and choose the IRC window. Here's the command:
+
+ ssh username@my-server -t screen -d -R irc
+
+=== Using systemd ===
+
+NixOS is now using systemd by default, and thus the way to define nix modules has changed.  Here's the commented equivalent of the snippet above:
+
+  {
+    systemd.services.ircSession = {
+      wantedBy = [ "multi-user.target" ]; 
+      after = [ "network.target" ];
+      serviceConfig = {
+        Type = "forking";
+        User = "username";
+        ExecStart = <nowiki>''${pkgs.screen}/bin/screen -dmS irc ${pkgs.irssi}/bin/irssi''</nowiki>;         
+        ExecStop = <nowiki>''${pkgs.screen}/bin/screen -S irc -X quit''</nowiki>;
+      };
+    };
+  }
+
+== Conditional Implementation ==
+
+Suppose we want to share this functionality with your second computer, which is a similar NixOS system. The computers are very similar, so we can reuse most of the configuration file. How do we use the same configuration file, but change behavior depending on the host system? One way is to assume the "hostname" of each system is unique. If the hostname is X, we enable the service, and if it is Y, we disable it.
+
+We can use the <code>mkIf</code> function in the <code>configuration.nix</code> file to add conditional behavior. Here's the new implementation:
+
+ {config, pkgs, ...}:
+ 
+ {
+   jobs = pkgs.lib.mkIf (config.networking.hostname == "my-server") {
+     ircSession = {
+       description = "Start the irc client of username.";
+       startOn = "started network-interfaces";
+       exec = <nowiki>''/var/setuid-wrappers/sudo -u username -- ${pkgs.screen}/bin/screen -m -d -S irc ${pkgs.irssi}/bin/irssi'';</nowiki>
+     };
+   };
+ 
+   environment.systemPackages = pkgs.lib.mkIf (config.networking.hostname == "my-server") [ pkgs.screen ];
+   security.sudo.enable = (config.networking.hostname == "my-server");
+ 
+   # ... usual configuration ...
+ }
+
+This works, but if we use too many conditionals, our code will become difficult to read and modify. For example, what do we do when we want to change the hostname?
+
+== Modular Configuration ==
+
+To avoid using conditional expressions in our <code>configuration.nix</code> file, we can separate these properties into units and blend them together differently for each host. Nix allows us to do this with the <code>imports</code> keyword (see [http://nixos.org/nixos/manual/#idp522432 NixOS Manual: Modularity]) to separate each concern into its own file. One way to organize this is to place common properties in the <code>configuration.nix</code> file and move the the IRC-related properties into an <code>irc-client.nix</code> file.
+
+If we move the IRC stuff into the <code>irc-client.nix</code> file, we change the <code>configuration.nix</code> file like this:
+
+ {
+   imports = [
+     ./irc-client.nix
+   ];
+ 
+   # ... usual configuration ...
+ }
+
+The <code>irc-client.nix</code> file will, of course, look like this:
+
+ {config, pkgs, ...}:
+ 
+ pkgs.lib.mkIf (config.networking.hostname == "my-server") {
+   jobs.ircSession = {
+     description = "Start the irc client of username.";
+     startOn = "started network-interfaces";
+     exec = <nowiki>''/var/setuid-wrappers/sudo -u username -- ${pkgs.screen}/bin/screen -m -d -S irc ${pkgs.irssi}/bin/irssi'';</nowiki>
+   };
+ 
+   environment.systemPackages = [ pkgs.screen ];
+   security.sudo.enable = true;
+ }
+
+If we organize our configuration like this, sharing it across machines is easier. In addition, our IRC client can be consistent across machines that choose to use it.
+
+== Generic Module Configuration ==
+
+Our IRC module is pretty useful, so we tell our friends on IRC about it. Now, they want to use our module. We still have our hostname hard-coded in our module, which isn't useful to our friends. We should remove stuff like this from our module before we distribute it to our friends. We should add a parameter so a user can pass their hostname to our module. How do we add a parameter to a module?
+
+NixOS supports this idea, but it is called "options". We can add options to our module for both the condition and the username. Here is what a <code>irc-client.nix</code> module with parameters/options looks like:
+
+<pre>
+ {config, pkgs, ...}:
+ 
+ let
+   cfg = config.services.ircClient;
+ in
+ 
+ with pkgs.lib;
+ 
+ {
+   options = {
+     services.ircClient = {
+       enable = mkOption {
+         default = false;
+         type = with types; bool;
+         description = ''
+           Start an irc client for a user.
+         '';
+       };
+ 
+       user = mkOption {
+         default = "username";
+         type = with types; uniq string;
+         description = ''
+           Name of the user.
+         '';
+       };
+     };
+   };
+ 
+   config = mkIf cfg.enable {
+     jobs.ircSession = {
+       description = "Start the irc client of ${cfg.user}.";
+       startOn = "started network-interfaces";
+       exec = ''/var/setuid-wrappers/sudo -u ${cfg.user} -- ${pkgs.screen}/bin/screen -m -d -S irc ${pkgs.irssi}/bin/irssi'';
+     };
+ 
+     environment.systemPackages = [ pkgs.screen ];
+     security.sudo.enable = true;
+   };
+ }
+</pre>
+
+This module is now independent of the system. Now, we must update our <code>configuration.nix</code> file to pass our condition and hostname into our new module.
+
+<pre>
+{config, ...}:
+
+ {
+   imports = [
+     ./irc-client.nix
+   ];
+ 
+   services.ircClient.enable = config.networking.hostname == "my-server";
+   services.ircClient.user = "username";
+ 
+   # ... usual configuration ...
+ }
+</pre>
+
+== Multiple Daemons ==
+
+Now, suppose your server has multiple people as users, and each wants the same IRC client running in background. One possibility is to replace the user name with a list of user names.  A better solution, for this tutorial, is to '''extend''' the <code>jobs</code> option. This will allow us to add "IRC jobs", each of which is for a specific user. This should create configuration options like this:
+
+ jobs.ircClient.user   = "User1";
+ jobs.ircClient.enable = true;
+
+The following code will add more options inside the <code>jobs.<name></code> option. This code is quite advanced, using many concepts from functional language paradigm.
+
+<pre>
+ {config, pkgs, ...}:
+ 
+ let
+   # Function which indicates whether the configuration defines any ircClient.
+   anyIrcClient = with pkgs.lib;
+     fold (j: v: v || j.ircClient.enable) (attrValues config.jobs);
+ in
+ 
+ with pkgs.lib;
+ 
+ {
+   options = {
+     # Add options to "jobs".
+     jobs.options = {config, ...}: let
+       cfg = config.ircClient;
+     in {
+       # The attributes in this set will merge into "jobs" set.
+       options = {
+         
+         # Add "ircClient.enable" to "jobs" set of options.
+         ircClient.enable = mkOption {
+           default = false;
+           type = with types; bool;
+           description = ''
+             Start an irc client for a user.
+           '';
+         };
+ 
+         # Add "ircClient.user" to "jobs" set of options.
+         ircClient.user = mkOption {
+           default = "username";
+           type = with types; uniq string;
+           description = ''
+             Name of the user.
+           '';
+         };
+       };
+ 
+       config = mkIf cfg.enable {
+         description = "Start the irc client of ${cfg.user}.";
+         startOn = "started network-interfaces";
+         exec = ''/var/setuid-wrappers/sudo -u ${cfg.user} -- ${pkgs.screen}/bin/screen -m -d -S irc ${pkgs.irssi}/bin/irssi'';
+       };
+     };
+   };
+ 
+   # Execute this code if this configuration defined any ircClient.
+   config = mkIf anyIrcClient {
+     environment.systemPackages = [ pkgs.screen ];
+     security.sudo.enable = true;
+   };
+ }
+</pre>
+
+= Testing Configuration Changes in a VM =
+
+Creating or modifying a NixOS configuration can be trial-and-error. Rather than change our working system on each configuration change, we can build it completely inside a VM, which is much safer.
+
+To see how this works, create a file like this:
+
+<pre>
+ {config, pkgs, ...}:
+ {
+   # You need to configure a root filesytem
+   fileSystems."/".label = "vmdisk";
+ 
+   # The test vm name is based on the hostname, so it's nice to set one
+   networking.hostName = "vmhost"; 
+ 
+   # Add a test user who can sudo to the root account for debugging
+   users.extraUsers.vm = {
+     password = "vm";
+     shell = "${pkgs.bash}/bin/bash";
+     group = "wheel";
+   };
+   security.sudo = {
+     enable = true;
+     wheelNeedsPassword = false;
+   };
+ 
+   # Enable your new service!
+   services =  {
+     myNewService = {
+       enable = true;
+     };
+   };
+ }
+</pre>
+
+Then, we build the new configuration inside a VM. If we named the above file <code>my-new-service.nix</code>, we can use these commands:
+
+ ## Create a VM from the new configuration.
+ $ NIXOS_CONFIG=`pwd`/vmtest.nix nixos-rebuild  -I nixos=/path/to/nixos/ build-vm
+ ## Then start it.
+ $ ./result/bin/run-vmhost-vm
+
+= What Next? =
+
+This tutorial follows the evolution of NixOS configuration modification, which ends in creating distributable modules.
+
+If you have another tutorial about extending NixOS, add a link below.
+
+* [http://larrythecow.org/archives/2011-10-11.html System Services on NixOS: larrythecow.org]
