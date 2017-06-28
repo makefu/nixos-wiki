@@ -81,7 +81,7 @@ This works, but if we use too many conditionals, our code will become difficult 
 
 == Modular Configuration ==
 
-To avoid using conditional expressions in our <code>configuration.nix</code> file, we can separate these properties into units and blend them together differently for each host. Nix allows us to do this with the <code>imports</code> keyword (see [http://nixos.org/nixos/manual/#idp522432 NixOS Manual: Modularity]) to separate each concern into its own file. One way to organize this is to place common properties in the <code>configuration.nix</code> file and move the the IRC-related properties into an <code>irc-client.nix</code> file.
+To avoid using conditional expressions in our <code>configuration.nix</code> file, we can separate these properties into units and blend them together differently for each host. Nix allows us to do this with the <code>imports</code> keyword (see [https://nixos.org/nixos/manual/index.html#sec-modularity NixOS Manual: Modularity]) to separate each concern into its own file. One way to organize this is to place common properties in the <code>configuration.nix</code> file and move the the IRC-related properties into an <code>irc-client.nix</code> file.
 
 If we move the IRC stuff into the <code>irc-client.nix</code> file, we change the <code>configuration.nix</code> file like this:
 
