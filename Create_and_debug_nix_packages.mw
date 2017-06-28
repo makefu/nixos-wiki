@@ -1,6 +1,11 @@
 This article describes how to work with the nix related repositories to add new packages, edit and debug existing packages. For details on the NixOS module system see [[NixOS:Modules]]. [[NixOS:extend_NixOS]] explains how to write, test and debug your own modules.
 
+There is a chapter about hacking packages and modules in the NixOS manual: http://nixos.org/nixos/manual/index.html#ch-development
+
+Writing packages is covered in http://nixos.org/nixpkgs/manual and writing modules in http://nixos.org/nixos/manual
+
 The nix repositories are hosted here: https://github.com/nixos
+
 
 == Basics ==
 The code for nix packages is managed in the nixpkgs repository. NixOS services, and other system configuration options are managed in the nixos sub-directory of the nixpkgs repository.
