@@ -208,4 +208,37 @@ then
 |follow the symlink
 |follow the symlink
 |
+|-
+| colspan="5" style="text-align:center"| Services
+|-
+|Start a service
+|<pre>sudo service apache start</pre>
+|<pre>sudo systemctl start apache</pre>
+|
+|
+|-
+|Stop a service
+|<pre>sudo service apache stop</pre>
+|<pre>sudo systemctl stop apache</pre>
+|
+|
+|-
+|Where your log files live
+|/var/log/
+|System-wide packages /var/log/
+|User packages ~/.nix-profile/var/log/
+|
+|-
+|Adding a user
+|sudo adduser alice
+|Add <pre>users.extraUsers.alice =
+ { isNormalUser = true;
+   home = "/home/alice";
+   description = "Alice Foobar";
+   extraGroups = [ "wheel" "networkmanager" ];
+   openssh.authorizedKeys.keys =
+      [ "ssh-dss AAAAB3Nza... alice@foobar" ];
+ };</pre> to to /etc/nixos/configuration.nix and then call <pre>nixos-rebuild switch</pre>
+|
+|
 |}
