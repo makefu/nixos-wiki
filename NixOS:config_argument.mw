@@ -1,0 +1,105 @@
+This argument gives access to the entire configuration of the system.  It is computed from option declarations and option definitions defined inside all modules used for the system.
+
+== Simple Case ==
+
+The following code is used to support the explanation.
+
+<pre>
+{config, pkgs, ...}:
+
+{
+  options = {
+    foo = pkgs.lib.mkOption {
+      description = "...";
+    };
+  };
+
+  config = {
+    bar = config.foo;
+  };
+}
+</pre>
+
+This snippet of code is a module which declare the option "<code>foo</code>" and define the option "<code>bar</code>".  The option "<code>bar</code>" is defined with the value <code>config.foo</code>.  This attribute <code>foo</code> of the <code>config</code> argument, is the result of the [[NixOS:Declaration#Evaluation|evaluation]] of the definitions and the declarations of the option "<code>foo</code>".  Definitions of the option "<code>foo</code>" may exists in other module used by the system.
+
+Adding additional modules to the system may change the value of <code>config.foo</code> and may change the behavior of the previous module.
+
+== Conditional Statements ==
+
+The process of module computation is highly recursive and may cause trouble when you want to add control flow statements.  A common mistake is to use "<code>if</code>" or "<code>assert</code>" statements in the computation of a module.
+
+<pre>
+{config, pkgs, ...}:
+
+{
+  options = {
+    foo = pkgs.lib.mkOption {
+      default = false;
+      type = with pkgs.lib.types; bool;
+      description = "enable foo";
+    };
+  };
+
+  config =
+    if config.foo then
+      { bar = 42; }
+    else
+      {};
+}
+</pre>
+
+The previous module cause an infinite recursion:
+* The <code>config</code> attribute is evaluated.  This evaluation needs the result of the <code>if</code> statement.
+* The <code>if</code> statement is evaluated.  This evaluation needs the result of the condition.
+* The condition (<code>config.foo</code>) is evaluated.  This evaluation needs the result of the <code>config</code> argument.
+* The <code>config</code> argument is evaluated.  This evaluation needs the result of merging of all modules.
+* The merge function of the modules is evaluated.  This evaluation needs the evaluation of each module <code>config</code> attribute.
+
+To avoid such infinite recursion, [[NixOS:Properties|properties]] have been introduced, thus the previous code should be rewritten in:
+
+<pre>
+{config, pkgs, ...}:
+
+{
+  options = {
+    foo = pkgs.lib.mkOption {
+      default = false;
+      type = with pkgs.lib.types; bool;
+      description = "enable foo";
+    };
+  };
+
+  config = pkgs.lib.mkIf config.foo {
+    bar = 42;
+  };
+}
+</pre>
+
+== Common Pattern ==
+
+Often, the module declare options embedded inside an attribute set.  To access these options, we add an attribute <code>cfg</code> as a shortcut notation.
+
+<pre>
+{config, pkgs, ...}:
+
+let
+  cfg = config.foo.bar.baz;
+
+  # ...
+in
+
+with pkgs.lib; {
+  options = {
+    foo.bar.baz = {
+      enable = mkOption { /* ... */ };
+      option1 = mkOption { /* ... */ };
+      option2 = mkOption { /* ... */ };
+      option3 = mkOption { /* ... */ }; 
+    };
+  };
+
+  config = mkIf cfg.enable {
+    # ...
+  };
+}
+</pre>
