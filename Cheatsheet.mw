@@ -1,0 +1,103 @@
+= A cheat sheet and rough mapping between Ubuntu and NixOS =
+This is meant to give you basic ideas and get you unstuck. NixOS being very different from most distributions, a deeper understanding will be necessary sooner or later! Follow the links to the manual pages and browse the wiki to find real NixOS tutorials.
+
+The system-wide column is the equivalent of using apt under Ubuntu.
+
+TODO Provide well-commented sample configuration.nix and ~/.nixpkgs/config.nix files with examples of common tasks.
+
+{| class="wikitable"
+!|Task
+!|Ubuntu
+!|NixOS (system-wide and root)
+!|NixOS (user) and Nix in general
+!|Relevant section of the manual
+|-
+| colspan="5" style="text-align:center"| Basic concepts
+|-
+| 
+| 
+|This column will let you do everything you can with Ubuntu and more.	
+|This column just isn't possible in Ubuntu.
+| 
+|-
+|Who can install packages and who can run them?
+|All packages are always system-wide and only root can install packages.
+|Packages root installs are system-wide. It does so through through /etc/nixos/configuration.nix. If root installs packages the same way users do, through ~/.nixpkgs/config.nix, they are also global. Root's default profile is the system-wide default profile.
+|Users can install their own packages and have their own profiles (environments) through ~/.nixpkgs/config.nix
+|[https://nixos.org/nixos/manual/index.html#sec-package-management Package management]
+
+|-
+|Package manager
+|apt which is really running on top of dpkg, sometimes wrapped by UIs like aptitude.
+|nix, but many system-wide operations are provided by nixos packages.
+|Just nix without the involvement of nixos.
+|
+|-
+|How do you select your official sources and major releases
+|These are baked into the distribution (e.g. Ubuntu version X). Upgrades are hard and permanent.
+|At any time you select from a collection of channels. They're system-wide when set by root. You can roll back changes or switch channels with ease.
+|Channels are per-user if they're not set by root.
+|
+|-
+|Where are packages installed?
+|apt installs globally into /bin/, /usr/, etc.	
+|System-wide packages are in /run/current-system/sw/ (these are installed because of /etc/nixos/configuration.nix) and /nix/var/nix/profiles/default/bin/ (this is the profile managed by root). Note that the files are just symlinks to the real packages managed by nix /nix/store/.
+|User packages are in ~/.nix-profile/. Note that the files are just symlinks to the real packages managed by nix in /nix/store/.
+|
+|-
+|When changes take effect
+|As soon as the command runs. Commands are not atomic and can leave your machine in a bad state.
+|Most of the time you modify the configuration file and apply changes with nixos-rebuild switch
+TODO How does one get nixos to do all the work for a switch and separate out the actual switching from fetching/building?
+|Most of the time you apply changes with nix-env -i all
+TODO How does one get nix to do all the work for a switch and separate out the actual switching from fetching/building?
+|
+|-
+|Packages
+|Uniformly referred to as packages
+|Technically called "derivations" but everyone calls them packages.
+|Technically called "derivations" but everyone calls them packages.
+|
+|-
+| colspan="5" style="text-align:center"| Package management
+|-
+|Install a package
+|<pre>sudo apt-get install emacs</pre>
+|In /etc/nixos/configuration.nix:
+If it's a program add to systemPackages:
+<pre>
+ systemPackages = with pkgs; 
+                    [ <other packages...> emacs ];</pre>
+If it's a service add:
+
+<pre>services.openssh.enable = true;</pre>
+|<pre>nix-env -i emacs</pre>
+Or with collections, add the package to your ~/.nixpkgs/config.nix and run
+<pre>nix-env -i all</pre>
+|
+|-
+|
+|
+|
+|
+|
+|-
+|
+|
+|
+|
+|
+|-
+|
+|
+|
+|
+|
+|-
+|
+|
+|
+|
+|
+
+|}
