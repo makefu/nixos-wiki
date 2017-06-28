@@ -241,4 +241,55 @@ then
  };</pre> to to /etc/nixos/configuration.nix and then call <pre>nixos-rebuild switch</pre>
 |
 |
+|-
+| colspan="5" style="text-align:center"| Misc tasks
+|-
+|List binaries
+|<pre>ls /usr/bin/</pre>
+|<pre>ls /run/current-system/sw/bin &&\
+ls /nix/var/nix/profiles/default/bin/</pre>
+|<pre>ls ~/.nix-profile/bin</pre>
+|
+|-
+|Get the current version number
+|<pre>cat /etc/debian_version</pre>
+|<pre>nixos-version</pre>
+|<pre>nixos-version</pre>
+|
+|-
+|Get sources for a package
+|<pre>apt-get source emacs</pre>
+|
+|In Debian, apt-get source gets both the patched upstream source and the recipe for the package. Those need two steps in Nix.
+
+To find the package recipe: <pre>grep -r emacs $(nix-instantiate --eval --expr '<nixpkgs>')</pre>
+To download the source as specified by the package recipe: <pre>nix-build '<nixpkgs>' -A emacs.src</pre>
+The patched source is usually not a derivation itself, but can be produced for most packages with the following command: <pre>nix-shell '<nixpkgs>' -A emacs\
+   --command 'unpackPhase; patchPhase'</pre>
+|
+|-
+|Compile & install a package from source
+|
+|
+|<pre>git clone foobar
+cat >default.nix <<EOF
+with import <nixpkgs> { };
+stdenv.lib.overrideDerivation foobar (oldAttrs : {
+  src = ./foobar;
+})
+EOF
+nix-build</pre>
+|
+|-
+|Install a binary package
+|
+|
+|
+|
+|-
+|Install a .deb
+|<pre>dpkg -i package.deb</pre>
+|
+|Install dpkg with Nix, then <pre>dpkg -i package.deb</pre>
+|
 |}
