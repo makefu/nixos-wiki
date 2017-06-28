@@ -31,7 +31,7 @@ The simplest way to implement this is to add a simple snippet of code to the <co
    # ... usual configuration ...
  }
 
-What does this do? The <code>jobs.ircSession</code> bit is an option which adds a new system service. This option is defined elsewhere in the NixOS configuration files. This is one of many options; you can see a list of all NixOS configuration options in the [http://nixos.org/nixos/manual/#ch-options NixOS Manual: List of Options]. We add attributes to this option to configure our new service. As you can see, we configure it to start when the network connects, and to execute a shell command.
+What does this do? The <code>jobs.ircSession</code> bit is an option which adds a new system service. This option is defined elsewhere in the NixOS configuration files. This is one of many options; you can see a list of all NixOS configuration options in the [https://nixos.org/nixos/manual/options.html NixOS Manual: List of Options]. We add attributes to this option to configure our new service. As you can see, we configure it to start when the network connects, and to execute a shell command.
 
 After rebuilding the NixOS configuration with this file, our IRC session should start when our network connects. The IRC session is started as a child to the screen daemon, which is independent of any user's session and will continue running when we log out. To connect to the IRC session, we SSH into the system, reconnect to the screen session, and choose the IRC window. Here's the command:
 
