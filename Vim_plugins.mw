@@ -36,7 +36,7 @@ There is a pathogen implementation as well, but its startup is slower and [VAM] 
 * Check https://github.com/NixOS/nixpkgs/tree/master/pkgs/misc/vim-plugins
 * Add your plugin to ./vim-plugin-names
 * Generate via <code>vim-plugin-names-to-nix</code>
-* If plugin needs additional code (for example: some dependencies, extra build steps etc.) then create a pull request to [https://github.com/jagajaga/vim-addon-vim2nix/tree/master/additional-nix-code vim2nix]. That will helps update plugins in the future.
+* <del>If plugin needs additional code (for example: some dependencies, extra build steps etc.) then create a pull request to [https://github.com/jagajaga/vim-addon-vim2nix/tree/master/additional-nix-code vim2nix]. That will helps update plugins in the future.</del>(vim2nix 404)
 
 = Real life examples =
 
