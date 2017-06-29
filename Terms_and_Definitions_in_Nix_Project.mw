@@ -1,0 +1,92 @@
+
+== Terms and Definitions ==
+
+If you come across a term or word you don't know, add it here.
+
+{| class="wikitable"
+|- 
+! Term || Context || Meaning || Related Links
+|--------
+|| <code>rec { }</code>
+|| Nix expressions
+|| The <code>{ }</code> block contains "mutually recursive" attributes, which means they can refer to each other.
+|| [http://nixos.org/nix/manual/#ex-hello-composition Composing the Hello Package]
+|--------
+|| <code>expression evaluator</code>
+|| Nix
+|| The part of the Nix program which reads and evaluates a Nix expression.
+|| [http://nixos.org/nix/manual/#sec-common-options Nix Manual: Common Options]&nbsp;<code>--arg</code> <br> [http://nixos.org/nix/manual/#ssec-builtins Nix Manual: Built-in Functions]
+|--------
+|| Derivation
+|| Nix
+|| A Nix expression which describes a build action. When evaluated, it creates one or more entries in the Nix Store. The <code>nix-instantiate</code> command is the command which creates entries in the Nix Store, while the <code>nix-env</code> and <code>nix-build</code> commands are its user-friendly interface.
+|| [http://nixos.org/nix/manual/#gloss-derivation Nix Manual: Glossary -> Derivation] <br> [http://nixos.org/nix/manual/#ssec-derivation Nix Manual: Derivation]
+|--------
+|| <code>stdenv</code>
+|| Nix expressions
+|| An attribute which contains things expected in the most basic Unix environment. (e.g. Bash shell, <code>gcc</code>, <code>cp</code>, <code>tar</code>, <code>grep</code>, etc.)
+|| [https://github.com/NixOS/nixpkgs/blob/master/pkgs/top-level/all-packages.nix#L224 all-packages.nix: <code>stdenv =</code>]]
+|--------
+|| User Environment
+|| Nix
+|| A set of "active" applications. These applications often exist in the Nix store. A single Nix user may have multiple User Environments.
+|| [http://nixos.org/nix/manual/#idp26825824 Nix Manual: Glossary]
+|--------
+|| User Profile
+|| Nix
+|| A user's currently selected User Environment.
+|| [http://nixos.org/nix/manual/#idp26825824 Nix Manual: Glossary]
+|--------
+|| Generation
+|| Nix
+|| A past revision of a user's environment. This term connotes the cloning and modification of an existing user environment. Nix's environment rollback facilities rely on Generations.
+|| [http://nixos.org/nix/manual/#sec-profiles Nix Manual: Profiles]
+|--------
+|| <code>config.nix</code> or <code>nixpkgs-config.nix</code>
+|| NixOS Wiki
+|| A Nix expression retrieved by and applied to the <code>all-packages.nix</code> Nix expression. This file enables an end-user to customize the Nix expressions contained in the community-owned NixPkgs list or to define entirely new Nix expressions to use with Nix commands. This file's path can be overridden by the <code>NIXPKGS_CONFIG</code> environment variable.
+|| [https://github.com/NixOS/nixpkgs/blob/master/pkgs/top-level/all-packages.nix#L54 all-packages.nix: <code>config</code>]
+[https://github.com/NixOS/nixpkgs/blob/master/doc/release-notes.xml#L366 NixPkgs Release Notes]
+|--------
+|| attribute path
+|| nix-env takes this if you pass the `-A` flag [http://nixos.org/nix/manual/#opt-attr] 
+|| an unambiguous identifier for a package
+|| 
+|--------
+|| symbolic package name
+|| [https://github.com/NixOS/nix/blob/master/doc/manual/expressions/simple-building-testing.xml#L31]
+|| This string represents what you commonly think of as a package. There can be multiple packages with the symbolic name "hello". 
+|| 
+|--------
+|| selector
+|| this term is used in nix-env error messages [https://github.com/NixOS/nix/blob/bdc4a0b54d54146448061dd9a248212f98a9f801/src/nix-env/nix-env.cc], it seems to be actually a DrvName struct [https://github.com/NixOS/nix/blob/bdc4a0b54d54146448061dd9a248212f98a9f801/src/libexpr/names.cc] (a derivation name) 
+|| see "symbolic package name"
+|| 
+|--------
+|| selection path
+|| nix-shell error message [https://github.com/NixOS/nix/blob/bdc4a0b54d54146448061dd9a248212f98a9f801/src/libexpr/attr-path.cc#L73]
+|| see "attribute path"[http://nixos.org/irc/logs/log.20151103] 
+|| 
+|--------
+|| derivation name
+|| manual[http://nixos.org/nix/manual/#rsec-nix-env-install], source code [https://github.com/NixOS/nix/blob/bdc4a0b54d54146448061dd9a248212f98a9f801/src/libexpr/names.cc]
+|| see "symbolic package name"
+|| 
+|--------
+|| package name
+|| IRC[http://nixos.org/irc/logs/log.20151103]
+|| see "symbolic package name"
+|| 
+|--------
+|| attribute selection path
+|| source[https://github.com/NixOS/nix/blob/bdc4a0b54d54146448061dd9a248212f98a9f801/src/libexpr/attr-path.cc#L41]
+|| see "attribute path"
+|| 
+<!--
+|--------
+|| <code>(term)</code>
+|| (where you saw the term)
+|| (meaning)
+|| (related links)
+-->
+|}
