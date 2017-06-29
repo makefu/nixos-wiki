@@ -54,7 +54,7 @@ If you come across a term or word you don't know, add it here.
 || 
 |--------
 || symbolic package name
-|| [https://github.com/NixOS/nix/blob/master/doc/manual/expressions/simple-building-testing.xml#L31]
+|| [http://nixos.org/nix/manual/#sec-building-simple]
 || This string represents what you commonly think of as a package. There can be multiple packages with the symbolic name "hello". 
 || 
 |--------
