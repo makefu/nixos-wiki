@@ -1,3 +1,6 @@
+= Warning =
+If you rely on Tor to provide anonymity you should ensure have a complete understanding of all parts involved!
+
 = How Tor is set up by default in NixOS =
 
 By default Tor in NixOS provides 2 different SOCKS proxies.
