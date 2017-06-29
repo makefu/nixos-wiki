@@ -1,0 +1,47 @@
+Vim plugins can be installed with the help of nix. You can omit using vim plugin managers and do everything in your <code>.nixpkgs/config</code>.
+
+= Examples =
+== Using VAM as manager ==
+You can add this to you nix configuration to get vim with custom <code>.vimrc</code> and listed plugins. 
+<pre>
+ vim_configurable.customize {
+    name = "vim-with-plugins";
+    # add custom .vimrc lines like this:
+    vimrcConfig.customRC = ''
+      set hidden
+      set colorcolumn=80 
+    '';
+    vimrcConfig.vam.knownPlugins = pkgs.vimPlugins; # optional
+    vimrcConfig.vam.pluginDictionaries = [
+      # load always
+      { name = "youcompleteme"; }
+      { names = [ "youcompleteme" "foo" ]; }
+      # only load when opening a .php file
+      { name = "phpCompletion"; ft_regex = "^php\$"; }
+      { name = "phpCompletion"; filename_regex = "^.php\$"; }
+      # provide plugin which can be loaded manually:
+      { name = "phpCompletion"; tag = "lazy"; }
+    ];
+  };
+</pre>
+Full documentation at [https://github.com/MarcWeber/vim-addon-manager VAM homepage].
+== Using Pathogen as manager ==
+There is a pathogen implementation as well, but its startup is slower and [VAM] has more features. 
+<pre>
+    vimrcConfig.pathogen.knownPlugins = vimPlugins; # optional
+    vimrcConfig.pathogen.pluginNames = [ "vim-addon-nix" "youcompleteme" ];
+</pre>
+= Adding new plugins =
+
+* Check https://github.com/NixOS/nixpkgs/tree/master/pkgs/misc/vim-plugins
+* Add your plugin to ./vim-plugin-names
+* Generate via <code>vim-plugin-names-to-nix</code>
+* If plugin needs additional code (for example: some dependencies, extra build steps etc.) then create a pull request to [https://github.com/jagajaga/vim-addon-vim2nix/tree/master/additional-nix-code vim2nix]. That will helps update plugins in the future.
+
+= Real life examples =
+
+* [https://github.com/jagajaga/my_configs/blob/master/.nixpkgs/common.nix Jagajaga’s config]
+* [https://github.com/andrewrk/dotfiles/blob/master/.nixpkgs/config.nix andrewrk's config]
+
+= YouCompleteMe =
+Currently the youcompleteme plugin uses [https://github.com/NixOS/nixpkgs/blob/8e7b1f2ac2e261d5a644fef860a0d050ea227c06/pkgs/misc/vim-plugins/default.nix#L695 unwrapped clang on linux]. This causes it to not find <code>stdlib.h</code>. There is a [https://github.com/andrewrk/genesis/blob/5f49cd9a8c2b61b9859a22102bc3f732add9461a/.ycm_extra_conf.py workaround] you can put in your <code>.ycm_extra_conf.py</code> file, which works by executing the C/C++ compiler and getting it to output the list of search paths - which includes the search path to find <code>stdlib.h</code>.
