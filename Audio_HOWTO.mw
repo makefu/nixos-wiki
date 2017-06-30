@@ -79,25 +79,6 @@ Once you have found a setting that works, you can add it to your configuration f
 
 Much of this is taken from https://help.ubuntu.com/community/HdaIntelSoundHowto which also has additional tips.
 
-=== Fixing sound in KDE ''(is this now obsolete? 2011/08)''' ===
-
-(alsamixer shows my audio card by default, but i get no sound in KDE)
-
-* be sure to explicitly install pkgs.kde44.phonon in /etc/nixos/configuration.nix (environment.kdePackages option) or via nix-env -i
-
-After this step you should be seeing xine and gstreamer backends in the systemsettings / Computer Administration / Multimedia 's Backends tab.
-
-* If you still see Pulseaudio as the only option in the main tab of systemsettings / Computer Administration / Multimedia, do the following:
-  
-  $ rm -rf ~/.pulse/*
-  $ killall5 -9 pulseaudio
-
-* Log out of kde and re-login
-
-Now you should be able to select your audio card, default hw0,0 etc as your audio device in systemsettings / Computer Administration / Multimedia
-
-Test the audio and enjoy the relaxing KDE's arpeggio.
-
 === Enabling PulseAudio ===
 
 In your config file:
