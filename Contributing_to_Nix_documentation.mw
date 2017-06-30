@@ -1,0 +1,44 @@
+== Where do I find the docs? ==
+
+The Nix documentation is on GitHub in the following repositories:
+
+* [https://github.com/NixOS/nixpkgs/doc Nix package manager]
+* [https://github.com/NixOS/nixpkgs/nixos/doc NixOS]
+* [https://github.com/NixOS/nixops NixOps]
+* [https://github.com/NixOS/hydra Hydra]
+
+== How do I create a topic? ==
+
+Nix documentation uses DocBook 5, an XML markup language. For general information on how to work in DocBook, see [http://www.docbook.org/tdg5/en/html/docbook.html DocBook the Definitive Guide].
+
+You can use an existing topic as a basis for the new topic or create a topic from scratch. 
+
+Keep the following guidelines in mind when you create and add a topic:
+* Make sure to store the topic file in the same directory as the book file to which you want to add the topic. The book file is an XML file normally named <tt>manual.xml</tt>. 
+* If you include multiple words in the file name, separate the words with a dash. For example: <tt>installing-cli.xml</tt>
+* Make sure that the <code>xml:id</code> value is unique. You can use abbreviations the ID is too long. For example: <tt>nixos-config</tt>
+* Determine whether your topic is a chapter or a section. If you are unsure, open an existing topic file and check whether the main element is <code>chapter</code> or <code>section</code>. 
+
+''Note: In the future you will be able to use a topic template. We welcome contributions to the template pool!''
+
+== How do I add a topic to a book? ==
+
+Open the parent XML file and add an <tt>xi:include element</tt> to the list of chapters with the file name of the topic that you created.
+If you created a section, you add the file to the chapter file. If you created a chapter, you add the file to the book file.
+
+== How do I build and test the manual? ==
+
+Before you commit the new or updated content, you compile the source files and check that the generated output looks and behaves as expected. You use Nix to build the documentation, and each manual requires a slightly different process.
+
+=== Prerequisites ===
+Before you build and test the output, you must install Nix on the machine where you store the local Git repo of the documentation.
+
+=== How to build the NixOS manual ===
+# In a terminal, navigate to the <tt>/nixpkgs/nixos</tt> directory, where the <tt>doc</tt> directory is located.
+# Run the following command: <code>$ nix-build release.nix -A manual.x86_64-linux</code>
+# Open the generated output in a Web browser from the following path: <tt>../nixos/result/share/doc/<project_name>/manual.html</tt>
+
+=== How to build the Nixpkgs manual ===
+# In a terminal, navigate to the <tt>nixpkgs/doc</tt> directory.
+# Run the following command: <code>$ nix-build</code>
+# Open the generated output in a Web browser from the following path: <tt>../nixpkgs/result/share/doc/<project_name>/manual.html</tt>
