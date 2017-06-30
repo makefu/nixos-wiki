@@ -21,12 +21,12 @@ In this section we will install NixOS by unpacking the ISO and then chrooting in
 === Preparations ===
 Get a NixOS ISO and unpack the squashfs filesystem containing the nix store. A tool from squashfs-tools is required, so install that package first.
 
-The following commands create two directories in your home directory, one for the ISO mountpoint and one for the host system. Then the latest ISO is downloaded (substitute as you please), mounted and the nix store extracted.
+The following commands create two directories in your home directory, one for the ISO mountpoint and one for the host system. Then the ISO is downloaded (substitute as you please), mounted and the nix store extracted.
  # cd ~
  # mkdir -p inst host/nix
- # wget http://nixos.org/releases/nixos/latest-iso-minimal-x86_64-linux
+ # wget https://d3g5gsiof5omrk.cloudfront.net/nixos/17.03/nixos-17.03.1449.2e983f14f6/nixos-minimal-17.03.1449.2e983f14f6-x86_64-linux.iso
  # modprobe loop
- # mount -o loop latest-iso-minimal-x86_64-linux inst
+ # mount -o loop nixos-minimal-17.03.1449.2e983f14f6-x86_64-linux.iso inst
  # unsquashfs -d host/nix/store inst/nix-store.squashfs '*'
 
 To have a working network connection, copy /etc/resolv.conf to host/nix/etc. For a working chroot, you also need to bind /dev, /proc and /sys directories to the target system.
