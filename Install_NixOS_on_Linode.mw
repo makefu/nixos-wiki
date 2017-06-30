@@ -165,3 +165,31 @@ The apiKey value can be found in Longview settings. The Longview service is not 
 
 === Other Changes ===
 Do other changes. Get your users set up as you want them. Get databases and what not set up. Set up your ports. Anything you care about really.
+
+== Install NixOS! ==
+Whoo! Everything's ready now. Just install nixos with its very own command.
+
+ unset NIXOS_CONFIG
+ nixos-install
+
+=== Set Root Password ===
+You should set the root password here. If you forget, you can use Linode's "Reset Root Password" option in the Rescue tab after finishing the install.
+ nixos-install --chroot
+ (chroot)$ passwd
+ Enter new UNIX password: ...
+                          ...
+                          ...
+ (chroot)$ exit
+
+== Shut Down Finnix ==
+The installation is finished. So, Shut down the linode.
+The last steps before booting the system is creating a configuration profile in the Linode Manager:
+* Boot Settings
+** Kernel: Direct Disk
+* Block Device Assignment
+** /dev/sda: nixos (or whatever you named it at the beginning)
+** root device: /dev/sda
+
+Change other configuration options to your preference.
+
+Here's is a sample configuration options:
