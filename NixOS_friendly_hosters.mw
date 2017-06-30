@@ -9,3 +9,4 @@
 
 == Other means of installation ==
 * Linode - See [[Install NixOS on Linode]]
+* AWS EC2 - See [[NixOS on Amazon EC2]]
