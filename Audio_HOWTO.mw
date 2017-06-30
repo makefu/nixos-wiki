@@ -1,0 +1,247 @@
+== Getting ALSA to work ==
+
+* on a console fire up alsamixer
+
+  alsamixer
+
+* you see plenty of vertical bars?
+** you should be okay
+
+* you see very few vertical bars and the sound card (top-left) is something like "PC Speaker"?
+** hit the 'S' key, you should be able to switch to the "real" audio card (if not your audio card is likely to not being supported yet).
+** when the real audio card is selected you should be viewing the "plenty vertical bars" thing.
+*** first thing to do is to disable pc speaker (kernel module "snd-pcsp", see below.
+
+=== Make your audio card the default ALSA card ===
+
+Sometimes the pc-speaker is the default audio card for ALSA. You can make your real sound card default instead.  For example, if your sound card is "hda-intel" then add
+<pre>
+  boot.extraModprobeConfig = ''
+    options snd slots=snd-hda-intel
+  '';
+</pre>
+to your <code>/etc/nixos/configuration.nix</code>.
+
+Sometimes, we may want to disable one of intel cards. Here is how to disable first card, but enable the second one.
+<pre>
+  boot.extraModprobeConfig = ''
+    options snd_hda_intel enable=0,1
+  '';
+</pre>
+
+Alternatively you can ...
+
+=== Disable PC Speaker "audio card" ===
+
+edit <code>/etc/nixos/configuration.nix</code> and add "snd_pcsp" to <code>boot.blacklistedKernelModules</code> option:
+
+  boot.blacklistedKernelModules = [ "snd_pcsp" ];
+
+Now reboot and retry from the beginning (i.e. check that your real card is shown by alsamixer without using the 'S' key).
+
+=== Other hardware specific problems ===
+
+Some hardware specific problems can be resolved by adjusting the options for the sound module. For example, the microphone may be stuck on an unusably low volume. First you should be sure that you have already checked the settings in alsamixer to make sure nothing is muted, and also any physical buttons on your computer (I have twice overlooked the mute button on laptops!). 
+
+You should be able to look up the available options for ''model'' in [https://www.kernel.org/doc/Documentation/sound/hd-audio/models.rst models.rst]. You can try them out interactively as follows:
+
+# Close any applications using the sound card
+## See if any applications are using the sound card
+##: $ lsof /dev/snd/*
+##: COMMAND     PID     USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+##: pulseaudi 14080 goibhniu   30u   CHR  116,7      0t0 5169 /dev/snd/controlC0
+##: pulseaudi 14080 goibhniu   37u   CHR  116,7      0t0 5169 /dev/snd/controlC0
+## Kill them
+##: for any process apart from pulseaudio you could just do:
+##: $ kill -9 14080
+##: but in the case of pulseaudio you have to prevent it from respawning itself automatically
+##: $ mkdir -P ~/.config/pulse && echo "autospawn=no" >> ~/.config/pulse/client.conf
+##: you can then stop pulseaudio with:
+##: $ pulseaudio -k # or kill it by process id
+# Unload the snd-hda-intel module
+#: rmmod snd-hda-intel
+# Find your model
+#: grep Codec /proc/asound/card0/codec*
+# [https://www.kernel.org/doc/Documentation/sound/hd-audio/models.rst Look up the model options for your card]
+# Try each one
+#: modprobe snd-hda-intel model=3stack-6ch
+# Test if this has fixed your problem (tip: aplay and arecord are alsa based command line tools you can use to quickly check)
+# Repeat until you have exhausted all the options or have fixed your problem
+# TIDY UP!
+#: Don't forget to re-enable pulse autospawning by changing "autospawn=no" to "autospawn=yes" in ~/.config/pulse/client.conf
+
+Once you have found a setting that works, you can add it to your configuration file:
+<pre>
+  boot.extraModprobeConfig = ''
+    options snd-hda-intel model=YOUR_MODEL 
+  '';
+</pre>
+
+Much of this is taken from https://help.ubuntu.com/community/HdaIntelSoundHowto which also has additional tips.
+
+=== Fixing sound in KDE ''(is this now obsolete? 2011/08)''' ===
+
+(alsamixer shows my audio card by default, but i get no sound in KDE)
+
+* be sure to explicitly install pkgs.kde44.phonon in /etc/nixos/configuration.nix (environment.kdePackages option) or via nix-env -i
+
+After this step you should be seeing xine and gstreamer backends in the systemsettings / Computer Administration / Multimedia 's Backends tab.
+
+* If you still see Pulseaudio as the only option in the main tab of systemsettings / Computer Administration / Multimedia, do the following:
+  
+  $ rm -rf ~/.pulse/*
+  $ killall5 -9 pulseaudio
+
+* Log out of kde and re-login
+
+Now you should be able to select your audio card, default hw0,0 etc as your audio device in systemsettings / Computer Administration / Multimedia
+
+Test the audio and enjoy the relaxing KDE's arpeggio.
+
+=== Enabling PulseAudio ===
+
+In your config file:
+<pre>hardware.pulseaudio.enable = true</pre>
+
+You can check if everything works by using pavucontrol to see the audio streams and to make sure that PulseAudio detects your audio hardware.
+
+Please ensure you have turned off the devices you do not want in the configuration section of pavucontrol.
+
+You may need to add your users to the audio group:
+<pre>
+$usermod -a -G audio myusername
+</pre>
+If a user is not a member the audio group only a dummy device will appear in pavucontrol. 
+
+The following command should only show that pulseaudio (and nothing else) is using the sound devices, if you see something like "plugin-container" in the COMMAND column then something is definitely not right, perhaps you have a local ~/.asoundrc which overrides the global alsa settings?.
+<pre>
+  $ lsof /dev/snd/*
+  COMMAND     PID     USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+  pulseaudi 14080 goibhniu   30u   CHR  116,7      0t0 5169 /dev/snd/controlC0
+  pulseaudi 14080 goibhniu   37u   CHR  116,7      0t0 5169 /dev/snd/controlC0
+</pre>
+
+=== Using JACK with PulseAudio ===
+
+[http://jackaudio.org The Jack Audio Connection Kit] is used by most of the serious audio applications on Linux. It provides real-time, low latency connections for both audio and MIDI data between applications that implement its API. NixOS uses the dbus version of JACK2 (jackdbus). This can be used together with pulseaudio with a little configuration. The result is that you don't have to manually hunt down applications which are using the sound device and kill them before starting JACK. You can also continue to use non-JACK aware applications (e.g. flash) at the same time as using JACK applications (e.g. Ardour).
+
+# Load the sequencer and midi kernel modules
+#: boot.kernelModules = [ "snd-seq" "snd-rawmidi" ];
+#Enable JACK support
+#: In your configuration file:
+#: <pre>hardware.pulseaudio.package = pkgs.pulseaudio.override { jackaudioSupport = true; };</pre>
+# Ensure that the JACK enabled pulseaudio is being used
+#: ~/.config/pulse/client.conf
+#: <pre>daemon-binary=/var/run/current-system/sw/bin/pulseaudio</pre>
+# Configure QjackCtl
+## Enable jackdbus
+##: Setup -> Settings -> Server Path: jackdbus
+##: [[File:qjackctl-settings.png]]
+##: Setup -> Misc -> Enable D-Bus interface: check
+##: [[File:qjackctl-misc.png]]
+## Load the jack modules for pulseaudio after starting jackdbus
+##: Setup -> Settings -> Options -> Execute script after Startup: check
+##: <pre>pactl load-module module-jack-sink channels=2; pactl load-module module-jack-source channels=2; pacmd set-default-sink jack_out</pre>
+##: Setup -> Settings -> Options -> Execute script on Shutdown: check
+##: <pre>pactl unload-module `pactl list|grep -A 3 jack-source|tail -1|awk '{ print $NF }'`;pactl unload-module `pactl list|grep -A 3 jack-sink|tail -1|awk '{ print $NF }'`</pre>
+##: [[File:qjackctl-options.png]]
+
+You should now be able to start JACK with QjackCtl, you will notice a new playback and capture device in your sound mixer along with your normal devices.
+
+[[File:kmix-pulseaudio-with-jack.png]]
+
+==== Troubleshooting JACK and PulseAudio ====
+
+<pre>$ pactl load-module module-jack-sink channels=2
+Failure: Module initalization failed</pre>
+
+Check if you have previous settings in ~/.config/jack/conf.xml. Try renaming this file and running the pactl command again.
+
+Otherwise, you may get further info by disabling PulseAudio respawning (see above) and starting it in verbose mode: 
+
+<pre>$ pulseaudio -vvv</pre>
+
+=== System optimizations for low latency audio with JACK ===
+
+Some of the following settings, documented in http://wiki.linuxmusicians.com/doku.php?id=system_configuration and https://wiki.archlinux.org/index.php/Pro_Audio can be very helpful to reduce xruns and improve responsiveness and are required for certain programs to run at all e.g. Ardour.
+The kernelPackages section was taken from https://github.com/rockfabrik/deployment/blob/master/modules/profiles/dj.nix#L32
+
+An easy way of setting all of these, plus a true realtime kernel, is here:
+https://github.com/musnix/musnix
+
+<pre>
+  boot = {
+    kernelModules = [ "snd-seq" "snd-rawmidi" ];
+    kernel.sysctl = { "vm.swappiness" = 10; "fs.inotify.max_user_watches" = 524288; };
+    kernelParams = [ "threadirq" ];
+    kernelPackages = let
+    rtKernel = pkgs.linuxPackagesFor (pkgs.linux.override {
+      extraConfig = ''
+        PREEMPT_RT_FULL? y
+        PREEMPT y
+        IOSCHED_DEADLINE y
+        DEFAULT_DEADLINE y
+        DEFAULT_IOSCHED "deadline"
+        HPET_TIMER y
+        CPU_FREQ n
+        TREE_RCU_TRACE n
+      '';
+    }) pkgs.linuxPackages;
+    in rtKernel;
+
+    postBootCommands = ''
+      echo 2048 > /sys/class/rtc/rtc0/max_user_freq
+      echo 2048 > /proc/sys/dev/hpet/max-user-freq
+      setpci -v -d *:* latency_timer=b0
+      setpci -v -s $00:1b.0 latency_timer=ff
+    '';
+    /*The SOUND_CARD_PCI_ID can be obtained like so:*/
+    /*$ lspci ¦ grep -i audio*/
+  };
+
+  powerManagement.cpuFreqGovernor = "performance";
+
+  fileSystems =
+  {
+    "/" = { options = "noatime errors=remount-ro"; };
+  };
+
+  security.pam.loginLimits =
+  [
+    { domain = "@audio"; item = "memlock"; type = "-"; value = "unlimited"; }
+    { domain = "@audio"; item = "rtprio"; type = "-"; value = "99"; }
+    { domain = "@audio"; item = "nofile"; type = "soft"; value = "99999"; }
+    { domain = "@audio"; item = "nofile"; type = "hard"; value = "99999"; }
+  ];
+
+  services = {
+    udev = {
+      packages = [ pkgs.ffado ]; # If you have a FireWire audio interface
+      extraRules = ''
+        KERNEL=="rtc0", GROUP="audio"
+        KERNEL=="hpet", GROUP="audio"
+      '';
+    };
+    cron.enable =false;
+  };
+
+  shellInit = ''
+    export VST_PATH=/nix/var/nix/profiles/default/lib/vst:/var/run/current-system/sw/lib/vst:~/.vst
+    export LXVST_PATH=/nix/var/nix/profiles/default/lib/lxvst:/var/run/current-system/sw/lib/lxvst:~/.lxvst
+    export LADSPA_PATH=/nix/var/nix/profiles/default/lib/ladspa:/var/run/current-system/sw/lib/ladspa:~/.ladspa
+    export LV2_PATH=/nix/var/nix/profiles/default/lib/lv2:/var/run/current-system/sw/lib/lv2:~/.lv2
+    export DSSI_PATH=/nix/var/nix/profiles/default/lib/dssi:/var/run/current-system/sw/lib/dssi:~/.dssi
+  '';
+
+  users = {
+    extraUsers.yourname= {
+      extraGroups = [ "wheel" "audio" ];
+    };
+  };
+
+</pre>
+
+
+[[Category:Installation]]
+[[Category:Configuration]]
+[[Category:Hardware]]
