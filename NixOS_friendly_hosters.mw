@@ -10,7 +10,7 @@
 == Other means of installation ==
 * [https://www.linode.com Linode] - See [[Install NixOS on Linode]]
 * [https://aws.amazon.com/ec2/ AWS EC2] - See [[NixOS on Amazon EC2]]
-* [https://www.onlin.net online.net] - See [[Install_NixOS_on_Online.Net]]
+* [https://www.online.net online.net] - See [[Install_NixOS_on_Online.Net]]
 * [https://www.rackspace.com Rackspace] - See [[Install_NixOS_on_Rackspace_Cloud_Servers]]
 * [https://www.ovh.com OVH] / [https://www.kimsufi.com Kimsufi] / [https://www.soyoustart.com SoYouStart] - See [https://web.archive.org/web/20160829180041/http://aborsu.github.io/2015/09/26/Install%20NixOS%20on%20So%20You%20Start%20dedicated%20server/ blogpost] by Augustin Borsu
 * [https://cloud.google.com Google Cloud Platform] - See [[Installing NixOS on GCE]]
