@@ -88,9 +88,9 @@ This approach relies on merging the LiveCD image with the contents of your worki
 
 === Unpacking the ISO image ===
 
- # wget http://nixos.org/releases/nixos/latest-iso-minimal-x86_64-linux # get the latest iso
+ # wget https://d3g5gsiof5omrk.cloudfront.net/nixos/17.03/nixos-17.03.1449.2e983f14f6/nixos-minimal-17.03.1449.2e983f14f6-x86_64-linux.iso # get the latest iso (URL might change!)
  # modprobe loop
- # mount -o loop latest-iso-minimal-x86_64-linux ~/inst
+ # mount -o loop nixos-minimal-17.03.1449.2e983f14f6-x86_64-linux.iso ~/inst
  # # mount /dev/sda1 # mount the /boot partition if you have it
  # cp ~/inst/boot/bzImage /boot/nixos-livecd-bzImage
  # cp ~/inst/boot/initrd /boot/nixos-livecd-initrd
