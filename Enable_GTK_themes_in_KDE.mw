@@ -1,0 +1,42 @@
+== KDE System Settings ==
+
+Nixpkgs now provides the GTK configuration module for KDE system settings, which you can install with:
+
+<pre>$ nix-env -i kde-gtk-config</pre>
+
+You should also install any GTK themes you like. You can choose a GTK theme and set related options in <code>System Settings > Application Appearance > GTK</code>.
+
+== Manually ==
+As a normal nix user you can install the Oxygen GTK theme:
+
+<pre>$ nix-env -i oxygen-gtk</pre>
+
+KDE will run any scripts you place in ~/.kde/env on startup so this is a good place to set the GTK_PATH so that applications can find the theme engine. If the path is wrong/unset you will see errors like this:
+
+<pre>Gtk-WARNING **: Unable to locate theme engine in module_path</pre>
+
+To set Oxygen-GTK as the gtk theme create the following file and make it executable: ~/.kde/env/set-gtk-theme.sh 
+<pre>
+#!/bin/sh
+
+export GTK_PATH=$GTK_PATH:~/.nix-profile/lib/gtk-2.0
+export GTK2_RC_FILES=$GTK2_RC_FILES:~/.nix-profile/share/themes/oxygen-gtk/gtk-2.0/gtkrc
+</pre>
+
+Alternatively, on NixOS:
+
+<pre>
+    environment = {
+      systemPackages = [ pkgs.oxygen_gtk ];
+      shellInit = ''
+        export GTK_PATH=$GTK_PATH:${pkgs.oxygen_gtk}/lib/gtk-2.0
+        export GTK2_RC_FILES=$GTK2_RC_FILES:${pkgs.oxygen_gtk}/share/themes/oxygen-gtk/gtk-2.0/gtkrc
+      '';
+    };
+</pre>
+
+Or alternatively, copy the themes folder in the home directory
+
+<pre>
+$ cp -R ~/.nix-profile/share/themes/ ~/.themes
+</pre>
