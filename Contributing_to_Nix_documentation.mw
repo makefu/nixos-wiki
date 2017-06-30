@@ -2,8 +2,8 @@
 
 The Nix documentation is on GitHub in the following repositories:
 
-* [https://github.com/NixOS/nixpkgs/doc Nix package manager]
-* [https://github.com/NixOS/nixpkgs/nixos/doc NixOS]
+* [https://github.com/NixOS/nix/tree/master/doc/manual Nix package manager]
+* [https://github.com/NixOS/nixpkgs/tree/master/doc NixOS]
 * [https://github.com/NixOS/nixops NixOps]
 * [https://github.com/NixOS/hydra Hydra]
 
