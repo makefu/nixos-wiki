@@ -20,6 +20,11 @@ Expect breaking changes until this message is removed.
 * NixOps [http://hydra.nixos.org/job/nixops/master/tarball/latest/download-by-type/doc/manual manual]
 * NixOS [[Cheatsheet]]
 
+=== Why Nix and NixOS ===
+* FAQ
+* Nixpkgs vs other packagers
+* [[Cheatsheet|the differences between Ubuntu and NixOS]]
+
 == Hosting Providers ==
 * [[NixOS friendly hosters]]
 
