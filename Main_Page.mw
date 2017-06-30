@@ -21,8 +21,8 @@ Expect breaking changes until this message is removed.
 * NixOS [[Cheatsheet]]
 
 === Why Nix and NixOS ===
-* FAQ
-* Nixpkgs vs other packagers
+* [[FAQ]]
+* [[Nixpkgs vs other packagers]]
 * [[Cheatsheet|the differences between Ubuntu and NixOS]]
 
 == Hosting Providers ==
