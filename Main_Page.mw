@@ -8,10 +8,9 @@ Expect breaking changes until this message is removed.
 == News ==
 * Login via GitHub has been enabled
 ** We are still working out some kinks. If you encounter any errors please contact [[User:Fadenb]]
-
-
-
-
+* More content
+** I am moving more and more content from the WaybackMachine to nixos.wiki while cleaning them up
+** Any help is appreciated
 
 == Getting started with Nix / NixOS ==
 * Nix [http://nixos.org/nix/manual/ manual]
