@@ -10,6 +10,8 @@ Lets start the IRC session using <code>irssi</code> as the IRC client. We'll run
 
 = Implementations =
 
+{{warning|text=The /var/setuid-wrappers directory is no longer current. For the new <code>security.wrappers</code> take a look at [https://github.com/NixOS/nixpkgs/blob/release-17.03/nixos/modules/security/wrappers/default.nix] and/or see https://nixos.org/nixos/manual/release-notes.html#sec-release-16.09}}
+
 == Quick Implementation ==
 
 The simplest way to implement this is to add a simple snippet of code to the <code>/etc/nixos/configuration.nix</code> file:
