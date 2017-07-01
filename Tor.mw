@@ -1,5 +1,5 @@
 = Warning =
-If you rely on Tor to provide anonymity you should ensure have a complete understanding of all parts involved!
+{{warning|text=If you rely on Tor to provide anonymity you should ensure have a complete understanding of all parts involved!}}
 
 = How Tor is set up by default in NixOS =
 
