@@ -1,0 +1,56 @@
+== X without a Display Manager is unsupported ==
+Many people (especially coming from Arch Linux) are used to starting X manually, e.g. with `startx`. In NixOS, this is currently unsupported.
+
+The reason that it is unsupported is that the upstreams (Xorg and systemd) by default do not support this functionality. Arch Linux has special hacks in place to make it work at all.
+
+If you really care about this feature, you are welcome to port these hacks to NixOS - there is no philosophical objection to having manual startx working. However, to date no one in the community has cared enough to get it working.
+
+== Use xlaunch ==
+{{warning|text=Several users on IRC have reported that this no longer works on unstable. (2015/07)}}
+
+1. Edit configuration.nix appropriately - the following has relevant bits for fluxbox:
+
+<pre>
+  environment.systemPackages = with pkgs; [
+    xlaunch
+  ];
+
+  security.setuidPrograms = [
+    "xlaunch"
+  ];
+
+  services.xserver = {
+    autorun = false;
+    enable = true;
+    enableTCP = false;
+    exportConfiguration = true;
+    layout = "us";
+    desktopManager = {
+      xterm.enable = false;
+      xfce.enable = false;
+    };
+    # XXX: slim must not be disabled for xlaunch to work
+#    displayManager = {
+#      slim.enable = false;
+#      job.execCmd = "";
+#    };
+    windowManager = {
+      fluxbox.enable = true;
+    };
+  };
+
+</pre>
+
+2. nixos-rebuild as usual:
+
+<pre>
+  # nixos-rebuild switch
+</pre>
+
+3. Possibly reboot
+
+4. Start xlaunch from command line, e.g. for fluxbox:
+
+<pre>
+  $ xlaunch startfluxbox
+</pre>
