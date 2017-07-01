@@ -1,7 +1,9 @@
 == test ==
 
-{{warning}} Don't do that!
+{{warning}}
 {{warning|text=Here is a long warning, which is sufficiently wordy to run onto a second line (unless you have a really large screen!), which would normally cause it to wrap round the icon, but because we passed it as a parameter it keeps its left alignment straight.}} 
+
+{{Notice|text=test}}
 
 
 
