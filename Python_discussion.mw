@@ -46,8 +46,3 @@ as discussed in [http://old.nabble.com/Python-3-to22076291.html#a22119842] and q
     # proper $PYTHONPATH that allows "import gtk" to succeed.
 
 so how should i package python-gudev then? the source for python-gudev (which produces the above error) can be found at [https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/python-modules/python-gudev/default.nix]
-
-== links ==
-
-* http://dpaste.com/756606/
-* https://gitorious.org/goibhniu/pages/nix-python (to be merged with this page)
