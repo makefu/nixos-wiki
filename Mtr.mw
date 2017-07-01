@@ -1,0 +1,4 @@
+== Issues ==
+=== mtr needs to be called with sudo ===
+To avoid the need to escalate privileges when calling <code>mtr</code> create a setcap wrapper by setting
+<code>programs.mtr.enable = true;</code>
