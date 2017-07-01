@@ -1,0 +1,36 @@
+
+Several channels exist for NixOS project discussion. Please subscribe to those which match your interests.
+
+
+== Project Discussion Channels ==
+
+=== Users ===
+
+* [http://lists.science.uu.nl/mailman/listinfo/nix-dev Nix-Dev Mailing List]
+* [irc://irc.freenode.net/#nixos #nixos IRC Channel on Freenode]
+* [https://matrix.to/#/#nix:matrix.org #nix:matrix.org] ([https://riot.im/app/#/room/#nix:matrix.org Click here to join as guest via riot.im])
+
+=== Developers ===
+
+* [https://github.com/NixOS/nixpkgs/issues NixPkgs Issues]
+* [https://github.com/NixOS/nix/issues Nix Issues]
+* [https://github.com/NixOS/nixops/issues NixOps Issues]
+
+
+== Community Publications ==
+
+=== This Week in NixOS ===
+
+* [https://compiletoi.net/this-week-in-nixos-5/ Week 5]
+* [https://compiletoi.net/this-week-in-nixos-4.html Week 4]
+* [https://compiletoi.net/this-week-in-nixos-3.html Week 3]
+* [https://compiletoi.net/this-week-in-nixos-3.html Week 2]
+* [https://compiletoi.net/this-week-in-nixos-3.html Week 1]
+
+
+== Blogs & Social Networks ==
+
+* [https://twitter.com/nixos_org @NixOS_org]
+* [https://twitter.com/NixOsTips @NixOSTips]
+* [https://twitter.com/NixPkg @NixPkg]
+* [http://planet.nixos.org/ Stream of Community Blogs - Planet NixOS]
